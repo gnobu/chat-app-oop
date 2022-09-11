@@ -118,6 +118,30 @@ class DBService {
 
         return fullGroupChat;
     }
+
+    async renameGroupChat(chatId, chatName) {
+        const updatedChat = await Chat.findByIdAndUpdate(chatId, { chatName }, { new: true })
+            .populate('users', '-password')
+            .populate('groupAdmin', '-password');
+
+        return updatedChat;
+    }
+
+    async addToGroupChat(chatId, userId){
+        const added = await Chat.findByIdAndUpdate(chatId, { $push: { users: userId } }, { new: true })
+            .populate('users', '-password')
+            .populate('groupAdmin', '-password');
+
+        return added;
+    }
+
+    async removeFromGroupChat(chatId, userId){
+        const removed = await Chat.findByIdAndUpdate(chatId, { $pull: { users: userId } }, { new: true })
+            .populate('users', '-password')
+            .populate('groupAdmin', '-password');
+
+        return removed;
+    }
 }
 
 module.exports = { DBService };
