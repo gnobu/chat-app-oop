@@ -6,7 +6,7 @@ const cors = require('cors');
 // const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/error.middleware');
 const userRoutes = require('./routes/user.route');
-// const chatRoutes = require('./routes/chatRoutes');
+const chatRoutes = require('./routes/chat.route');
 // const messageRoutes = require('./routes/messageRoutes');
 
 
@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/user', userRoutes);
 
-// app.use('/api/chat', chatRoutes);
+app.use('/api/chat', chatRoutes);
 
 // app.use('/api/message', messageRoutes);
 
