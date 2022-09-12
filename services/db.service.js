@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 const Chat = require("../models/chat.model");
+const Message = require("../models/message.model");
 
 class DBService {
     async getUserByMail(email) {
@@ -127,7 +128,7 @@ class DBService {
         return updatedChat;
     }
 
-    async addToGroupChat(chatId, userId){
+    async addToGroupChat(chatId, userId) {
         const added = await Chat.findByIdAndUpdate(chatId, { $push: { users: userId } }, { new: true })
             .populate('users', '-password')
             .populate('groupAdmin', '-password');
@@ -135,12 +136,40 @@ class DBService {
         return added;
     }
 
-    async removeFromGroupChat(chatId, userId){
+    async removeFromGroupChat(chatId, userId) {
         const removed = await Chat.findByIdAndUpdate(chatId, { $pull: { users: userId } }, { new: true })
             .populate('users', '-password')
             .populate('groupAdmin', '-password');
 
         return removed;
+    }
+
+    async createNewMessage(content, chatId, userId) {
+        const newMessage = {
+            sender: userId,
+            content,
+            chat: chatId
+        }
+        let message = await Message.create(newMessage);
+
+        message = await message.populate('sender', 'name pic');
+        message = await message.populate('chat');
+        message = await User.populate(message, {
+            path: 'chat.users',
+            select: 'name pic email'
+        });
+
+        await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
+
+        return message;
+    }
+
+    async fetchMessages(chatId) {
+        const messages = await Message.find({ chat: chatId })
+            .populate('sender', 'name pic email')
+            .populate('chat');
+
+        return messages;
     }
 }
 
