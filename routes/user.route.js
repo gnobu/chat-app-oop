@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const { Auth, registerUser, authUser, sendSignature, allUsers } = require('../controllers/user.controller');
+const { Auth } = require('../controllers/user.controller');
 const { protect, validatePic } = require('../middleware/auth.middleware');
 
 const { DBService } = require('../services/db.service');
